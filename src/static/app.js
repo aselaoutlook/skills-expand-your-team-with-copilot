@@ -487,10 +487,10 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    renderActivitiesList(filteredActivities);
+    renderActivityCards(filteredActivities, activitiesList);
   }
 
-  function renderActivitiesList(activities, container = activitiesList) {
+  function renderActivityCards(activities, container) {
     Object.entries(activities).forEach(([name, details]) => {
       renderActivityCard(name, details, container);
     });
@@ -524,7 +524,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const groupList = document.createElement("div");
       groupList.className = "activity-group-list";
 
-      renderActivitiesList(groupedActivities[activityType], groupList);
+      renderActivityCards(groupedActivities[activityType], groupList);
 
       groupSection.appendChild(groupHeading);
       groupSection.appendChild(groupList);
@@ -533,7 +533,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Function to render a single activity card
-  function renderActivityCard(name, details, container = activitiesList) {
+  function renderActivityCard(name, details, container) {
     const activityCard = document.createElement("div");
     activityCard.className = "activity-card";
 
