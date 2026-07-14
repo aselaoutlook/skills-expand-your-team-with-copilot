@@ -1,0 +1,94 @@
+name: Update an Existing Activity
+description: Request changes to the details of an activity already listed on the website.
+title: "Update activity: [Activity Name]"
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to request changes to an existing extracurricular activity on the Mergington High School Activities website.
+        Fill in the activity name and only the fields you want to change. Leave other fields blank if they should stay the same.
+
+  - type: input
+    id: activity-name
+    attributes:
+      label: Activity Name
+      description: The exact name of the activity as it currently appears on the website.
+      placeholder: "e.g. Chess Club"
+    validations:
+      required: true
+
+  - type: textarea
+    id: new-description
+    attributes:
+      label: New Description (leave blank to keep unchanged)
+      description: The updated description for this activity. Leave this blank if the description should not change.
+      placeholder: "e.g. Learn chess strategies and compete in school and regional tournaments."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: new-schedule-days
+    attributes:
+      label: New Meeting Days (leave all unchecked to keep unchanged)
+      description: If the meeting days are changing, select all new days. Leave all unchecked to keep the current days.
+      options:
+        - label: Monday
+        - label: Tuesday
+        - label: Wednesday
+        - label: Thursday
+        - label: Friday
+        - label: Saturday
+        - label: Sunday
+    validations:
+      required: false
+
+  - type: input
+    id: new-start-time
+    attributes:
+      label: New Start Time (leave blank to keep unchanged)
+      description: The updated start time. Use 12-hour format (e.g. 3:30 PM). Leave blank if unchanged.
+      placeholder: "e.g. 3:30 PM"
+    validations:
+      required: false
+
+  - type: input
+    id: new-end-time
+    attributes:
+      label: New End Time (leave blank to keep unchanged)
+      description: The updated end time. Use 12-hour format (e.g. 5:00 PM). Leave blank if unchanged.
+      placeholder: "e.g. 5:00 PM"
+    validations:
+      required: false
+
+  - type: input
+    id: new-max-participants
+    attributes:
+      label: New Maximum Participants (leave blank to keep unchanged)
+      description: The updated maximum number of students allowed in this activity. Leave blank if unchanged.
+      placeholder: "e.g. 25"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: new-difficulty
+    attributes:
+      label: New Difficulty Level (leave as "No change" to keep unchanged)
+      description: Update the difficulty level, or select "No change" to keep the current value.
+      options:
+        - No change
+        - None
+        - Beginner
+        - Intermediate
+        - Advanced
+    validations:
+      required: false
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: Reason for Change
+      description: Briefly explain why this change is needed. This helps with understanding the request.
+      placeholder: "e.g. The room we used is no longer available on Mondays, so we are switching to Tuesdays."
+    validations:
+      required: true
