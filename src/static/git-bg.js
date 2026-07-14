@@ -7,7 +7,7 @@
   if (!canvas) return;
   const ctx = canvas.getContext("2d");
 
-  // ── Colour palette (lime-green school theme) ──────────────────────────
+  // ── Color palette (lime-green school theme) ──────────────────────────
   const LANE_COLORS = [
     "#5c8a00", // lime green (primary)
     "#8abd2e", // light lime
@@ -147,6 +147,8 @@
   }
 
   // ── Animation loop ────────────────────────────────────────────────────
+  let animationId = null;
+
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -156,11 +158,25 @@
     drawBranches();
 
     offset = (offset + SCROLL_SPEED) % (COMMIT_SPACING * 5 + canvas.height);
-    requestAnimationFrame(draw);
+    animationId = requestAnimationFrame(draw);
   }
+
+  // Pause animation when the tab is hidden to save CPU/GPU resources
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) {
+      if (animationId !== null) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+      }
+    } else {
+      if (animationId === null) {
+        animationId = requestAnimationFrame(draw);
+      }
+    }
+  });
 
   // ── Init ──────────────────────────────────────────────────────────────
   window.addEventListener("resize", resize);
   resize();
-  draw();
+  animationId = requestAnimationFrame(draw);
 })();
