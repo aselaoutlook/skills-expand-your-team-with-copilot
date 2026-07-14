@@ -772,3 +772,177 @@ footer {
 body.dark-mode .activity-tag {
   filter: brightness(0.65);
 }
+
+/* View Toggle */
+.view-toggle-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+  gap: 5px;
+}
+
+.view-toggle-btn {
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.view-toggle-btn.active {
+  background-color: var(--primary);
+  color: white;
+  border-color: var(--primary-dark);
+}
+
+.view-toggle-btn:hover:not(.active) {
+  background-color: var(--primary-light);
+  color: white;
+}
+
+/* Calendar View — override the default grid layout */
+#activities-list.calendar-view {
+  display: block;
+  overflow-x: auto;
+}
+
+.calendar-grid {
+  display: flex;
+  min-width: 580px;
+  position: relative;
+}
+
+/* Time label column on the left */
+.calendar-time-col {
+  width: 45px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.calendar-time-label {
+  position: absolute;
+  right: 6px;
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  transform: translateY(-50%);
+  white-space: nowrap;
+}
+
+/* Individual day columns */
+.calendar-day-col {
+  flex: 1;
+  border-left: 1px solid var(--border);
+  min-width: 0;
+}
+
+.calendar-day-header {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.8rem;
+  background-color: var(--primary);
+  color: var(--primary-text);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.calendar-day-body {
+  position: relative;
+  background-color: var(--surface);
+}
+
+.calendar-hour-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px solid var(--border-light);
+  pointer-events: none;
+}
+
+/* Activity entries inside each day column */
+.calendar-entry {
+  position: absolute;
+  border-radius: 3px;
+  padding: 3px 5px;
+  overflow: hidden;
+  font-size: 0.72rem;
+  box-sizing: border-box;
+  transition: z-index 0s;
+}
+
+.calendar-entry:hover {
+  z-index: 20;
+  overflow: visible;
+}
+
+.calendar-entry.clickable {
+  cursor: pointer;
+}
+
+.calendar-entry-content {
+  overflow: hidden;
+  height: 100%;
+}
+
+.calendar-entry-name {
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.calendar-entry-enrolled {
+  font-size: 0.65rem;
+  opacity: 0.85;
+}
+
+/* Hover tooltip for calendar entries */
+.calendar-entry-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 0;
+  min-width: 190px;
+  max-width: 260px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 8px 10px;
+  font-size: 0.78rem;
+  color: var(--text-primary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  z-index: 100;
+  line-height: 1.5;
+  pointer-events: none;
+}
+
+.calendar-entry:hover .calendar-entry-tooltip {
+  display: block;
+}
+
+.calendar-tooltip-name {
+  font-weight: bold;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+
+.calendar-tooltip-full {
+  color: var(--error);
+  font-weight: bold;
+  margin-top: 4px;
+}
+
+/* Simple loading indicator for calendar mode */
+.calendar-loading {
+  padding: 20px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
