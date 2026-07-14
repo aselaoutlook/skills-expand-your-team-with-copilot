@@ -1,0 +1,36 @@
+name: Remove a Student from an Activity
+description: Request to remove a student's registration from an extracurricular activity.
+title: "Remove student from activity: [Activity Name]"
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to request that a student be removed from an activity they are currently registered for on the Mergington High School Activities website.
+
+  - type: input
+    id: activity-name
+    attributes:
+      label: Activity Name
+      description: The exact name of the activity as it appears on the website.
+      placeholder: "e.g. Chess Club"
+    validations:
+      required: true
+
+  - type: input
+    id: student-email
+    attributes:
+      label: Student Email Address
+      description: The student's school email address that was used to register (e.g. firstname@mergington.edu).
+      placeholder: "e.g. student@mergington.edu"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: Reason for Removal
+      description: Why does this student need to be removed? (e.g. the student has left the school, transferred to another activity, etc.)
+      placeholder: "e.g. The student has transferred to another activity."
+    validations:
+      required: true

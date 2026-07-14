@@ -1,0 +1,93 @@
+name: Add a New Activity
+description: Request to add a new extracurricular activity or club to the website.
+title: "Add activity: [Activity Name]"
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to request a new extracurricular activity or club be added to the Mergington High School Activities website.
+        Fill in all fields as completely as possible so the request can be handled without follow-up questions.
+
+  - type: input
+    id: activity-name
+    attributes:
+      label: Activity Name
+      description: The full name of the activity or club as it should appear on the website.
+      placeholder: "e.g. Photography Club"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Activity Description
+      description: A short description of the activity. This will be shown to students on the website.
+      placeholder: "e.g. Learn photography techniques and go on photo walks around the school grounds."
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: schedule-days
+    attributes:
+      label: Meeting Days
+      description: Which days of the week does this activity meet?
+      options:
+        - label: Monday
+        - label: Tuesday
+        - label: Wednesday
+        - label: Thursday
+        - label: Friday
+        - label: Saturday
+        - label: Sunday
+    validations:
+      required: true
+
+  - type: input
+    id: start-time
+    attributes:
+      label: Start Time
+      description: What time does the activity start? Use 12-hour format (e.g. 3:30 PM).
+      placeholder: "e.g. 3:30 PM"
+    validations:
+      required: true
+
+  - type: input
+    id: end-time
+    attributes:
+      label: End Time
+      description: What time does the activity end? Use 12-hour format (e.g. 5:00 PM).
+      placeholder: "e.g. 5:00 PM"
+    validations:
+      required: true
+
+  - type: input
+    id: max-participants
+    attributes:
+      label: Maximum Number of Participants
+      description: What is the maximum number of students that can join this activity?
+      placeholder: "e.g. 20"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: difficulty
+    attributes:
+      label: Difficulty Level (optional)
+      description: If this activity has a skill level, please select one. Leave as "None" if not applicable.
+      options:
+        - None
+        - Beginner
+        - Intermediate
+        - Advanced
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: Additional Information
+      description: Any other details that should be noted, such as required materials, prerequisites, or special instructions.
+      placeholder: "e.g. Students should bring their own camera if they have one."
+    validations:
+      required: false

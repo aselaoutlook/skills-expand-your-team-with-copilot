@@ -1,0 +1,49 @@
+name: Add a New Teacher Account
+description: Request a new teacher login account for the Mergington High School Activities website.
+title: "Add teacher account: [Teacher Name]"
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to request a new teacher account on the Mergington High School Activities website.
+        Teachers can log in to manage student registrations for activities.
+        **Do not put real passwords in this form.** A temporary password will be assigned and shared separately.
+
+  - type: input
+    id: display-name
+    attributes:
+      label: Teacher Display Name
+      description: The name that will be shown on the website (e.g. "Ms. Johnson"). Use the format "Title. Last name".
+      placeholder: "e.g. Ms. Johnson"
+    validations:
+      required: true
+
+  - type: input
+    id: username
+    attributes:
+      label: Username
+      description: A short username for logging in. Use lowercase letters only, no spaces (e.g. "mjohnson"). This is usually the first initial and last name.
+      placeholder: "e.g. mjohnson"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: role
+    attributes:
+      label: Account Role
+      description: Select "Teacher" for a standard teacher account. Select "Admin" only for the principal or IT administrator.
+      options:
+        - Teacher
+        - Admin
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: Additional Information
+      description: Any other details about this request, such as which activities this teacher will manage.
+      placeholder: "e.g. Ms. Johnson will be the supervisor for the new Photography Club."
+    validations:
+      required: false
