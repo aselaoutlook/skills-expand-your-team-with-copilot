@@ -42,6 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentDay = "";
   let currentTimeRange = "";
   let currentDifficulty = "";
+  let currentView = "card"; // "card" or "calendar"
 
   // Authentication state
   let currentUser = null;
@@ -260,6 +261,12 @@ document.addEventListener("DOMContentLoaded", () => {
   function showLoadingSkeletons() {
     activitiesList.innerHTML = "";
 
+    // In calendar view, just show a simple loading message
+    if (currentView === "calendar") {
+      activitiesList.innerHTML = '<div class="calendar-loading">Loading activities...</div>';
+      return;
+    }
+
     // Create more skeleton cards to fill the screen since they're smaller now
     for (let i = 0; i < 9; i++) {
       const skeletonCard = document.createElement("div");
@@ -465,6 +472,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Check if there are any results
     if (Object.keys(filteredActivities).length === 0) {
+      activitiesList.classList.remove("calendar-view");
       activitiesList.innerHTML = `
         <div class="no-results">
           <h4>No activities found</h4>
@@ -474,10 +482,16 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Display filtered activities
-    Object.entries(filteredActivities).forEach(([name, details]) => {
-      renderActivityCard(name, details);
-    });
+    // Display filtered activities in the chosen view
+    if (currentView === "calendar") {
+      activitiesList.classList.add("calendar-view");
+      renderCalendarView(filteredActivities);
+    } else {
+      activitiesList.classList.remove("calendar-view");
+      Object.entries(filteredActivities).forEach(([name, details]) => {
+        renderActivityCard(name, details);
+      });
+    }
   }
 
   // Function to render a single activity card
@@ -606,6 +620,177 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     activitiesList.appendChild(activityCard);
+  }
+
+  // ── Calendar view constants ──────────────────────────────────────────────────
+  const CALENDAR_START_HOUR = 7;  // 7 AM
+  const CALENDAR_END_HOUR = 20;   // 8 PM
+  const HOUR_HEIGHT = 60;          // pixels per hour
+
+  // Assign a horizontal slot (column) to each activity so overlapping entries
+  // are shown side-by-side.  Returns an array of positioned activity objects.
+  function assignCalendarPositions(activities) {
+    function timeToMinutes(timeStr) {
+      const [h, m] = timeStr.split(":").map(Number);
+      return h * 60 + m;
+    }
+
+    // Parse times and sort by start
+    const items = activities.map(({ name, details }) => ({
+      name,
+      details,
+      start: timeToMinutes(details.schedule_details.start_time),
+      end: timeToMinutes(details.schedule_details.end_time),
+      slot: -1,
+    })).sort((a, b) => a.start - b.start);
+
+    // Greedy interval graph coloring: place each activity in the first slot
+    // whose last activity has already ended.
+    const slotEndTimes = [];
+    items.forEach(item => {
+      let slot = slotEndTimes.findIndex(endTime => endTime <= item.start);
+      if (slot === -1) {
+        slot = slotEndTimes.length;
+        slotEndTimes.push(item.end);
+      } else {
+        slotEndTimes[slot] = item.end;
+      }
+      item.slot = slot;
+    });
+
+    const totalSlots = slotEndTimes.length || 1;
+
+    return items.map(item => ({
+      name: item.name,
+      details: item.details,
+      top: Math.max(0, (item.start / 60 - CALENDAR_START_HOUR) * HOUR_HEIGHT),
+      height: Math.max(18, ((item.end - item.start) / 60) * HOUR_HEIGHT),
+      left: (item.slot / totalSlots) * 100,
+      width: (1 / totalSlots) * 100,
+    }));
+  }
+
+  // Build a single calendar entry element.
+  function createCalendarEntry(name, details, top, height, left, width) {
+    const takenSpots = details.participants.length;
+    const totalSpots = details.max_participants;
+    const isFull = takenSpots >= totalSpots;
+    const spotsLeft = totalSpots - takenSpots;
+
+    const activityType = getActivityType(name, details.description);
+    const typeInfo = activityTypes[activityType];
+    const formattedSchedule = formatSchedule(details);
+
+    const entry = document.createElement("div");
+    entry.className = "calendar-entry" + (currentUser && !isFull ? " clickable" : "");
+    entry.style.top = `${top}px`;
+    entry.style.height = `${height}px`;
+    entry.style.left = `${left}%`;
+    entry.style.width = `calc(${width}% - 2px)`;
+    entry.style.backgroundColor = typeInfo.color;
+    entry.style.borderLeft = `3px solid ${typeInfo.textColor}`;
+    entry.style.color = typeInfo.textColor;
+
+    entry.innerHTML = `
+      <div class="calendar-entry-content">
+        <div class="calendar-entry-name">${name}</div>
+        <div class="calendar-entry-enrolled">${takenSpots}/${totalSpots}</div>
+      </div>
+      <div class="calendar-entry-tooltip">
+        <div class="calendar-tooltip-name">${name}</div>
+        <div>${details.description}</div>
+        <div style="margin-top:4px"><strong>Schedule:</strong> ${formattedSchedule}</div>
+        <div>${takenSpots} enrolled &bull; ${spotsLeft} spots left</div>
+        ${isFull ? '<div class="calendar-tooltip-full">Activity Full</div>' : ""}
+        ${currentUser && !isFull ? '<div style="margin-top:4px;font-style:italic">Click to register a student</div>' : ""}
+      </div>
+    `;
+
+    if (currentUser && !isFull) {
+      entry.addEventListener("click", () => openRegistrationModal(name));
+    }
+
+    return entry;
+  }
+
+  // Render a full weekly calendar (Sun–Sat) for the given filtered activities.
+  function renderCalendarView(filteredActivities) {
+    activitiesList.innerHTML = "";
+
+    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const totalHours = CALENDAR_END_HOUR - CALENDAR_START_HOUR;
+    const totalHeight = totalHours * HOUR_HEIGHT;
+    const headerHeight = 36; // px — matches .calendar-day-header height
+
+    // Build a day → [{name, details}] map
+    const dayActivities = {};
+    days.forEach(day => { dayActivities[day] = []; });
+
+    Object.entries(filteredActivities).forEach(([name, details]) => {
+      if (!details.schedule_details) return;
+      details.schedule_details.days.forEach(day => {
+        if (dayActivities[day]) {
+          dayActivities[day].push({ name, details });
+        }
+      });
+    });
+
+    const calendarGrid = document.createElement("div");
+    calendarGrid.className = "calendar-grid";
+
+    // ── Time label column ────────────────────────────────────────────────────
+    const timeCol = document.createElement("div");
+    timeCol.className = "calendar-time-col";
+    timeCol.style.height = `${headerHeight + totalHeight}px`;
+
+    for (let h = CALENDAR_START_HOUR; h <= CALENDAR_END_HOUR; h++) {
+      const label = document.createElement("div");
+      label.className = "calendar-time-label";
+      // Offset by the header height so hour labels align with the day body
+      label.style.top = `${headerHeight + (h - CALENDAR_START_HOUR) * HOUR_HEIGHT}px`;
+      const period = h >= 12 ? "PM" : "AM";
+      const displayH = h % 12 || 12;
+      label.textContent = `${displayH}${period}`;
+      timeCol.appendChild(label);
+    }
+    calendarGrid.appendChild(timeCol);
+
+    // ── Day columns ──────────────────────────────────────────────────────────
+    days.forEach(day => {
+      const dayCol = document.createElement("div");
+      dayCol.className = "calendar-day-col";
+
+      const dayHeader = document.createElement("div");
+      dayHeader.className = "calendar-day-header";
+      dayHeader.textContent = day.substring(0, 3).toUpperCase();
+      dayCol.appendChild(dayHeader);
+
+      const dayBody = document.createElement("div");
+      dayBody.className = "calendar-day-body";
+      dayBody.style.height = `${totalHeight}px`;
+
+      // Horizontal hour-divider lines
+      for (let h = CALENDAR_START_HOUR; h <= CALENDAR_END_HOUR; h++) {
+        const line = document.createElement("div");
+        line.className = "calendar-hour-line";
+        line.style.top = `${(h - CALENDAR_START_HOUR) * HOUR_HEIGHT}px`;
+        dayBody.appendChild(line);
+      }
+
+      // Place activity entries, accounting for overlaps
+      const activities = dayActivities[day];
+      if (activities.length > 0) {
+        const positioned = assignCalendarPositions(activities);
+        positioned.forEach(({ name, details, top, height, left, width }) => {
+          dayBody.appendChild(createCalendarEntry(name, details, top, height, left, width));
+        });
+      }
+
+      dayCol.appendChild(dayBody);
+      calendarGrid.appendChild(dayCol);
+    });
+
+    activitiesList.appendChild(calendarGrid);
   }
 
   // Share an activity using native Web Share API or a fallback dropdown
@@ -1038,6 +1223,26 @@ document.addEventListener("DOMContentLoaded", () => {
     setDayFilter,
     setTimeRangeFilter,
   };
+
+  // View toggle buttons
+  const cardViewBtn = document.getElementById("card-view-btn");
+  const calendarViewBtn = document.getElementById("calendar-view-btn");
+
+  cardViewBtn.addEventListener("click", () => {
+    if (currentView === "card") return;
+    currentView = "card";
+    cardViewBtn.classList.add("active");
+    calendarViewBtn.classList.remove("active");
+    displayFilteredActivities();
+  });
+
+  calendarViewBtn.addEventListener("click", () => {
+    if (currentView === "calendar") return;
+    currentView = "calendar";
+    calendarViewBtn.classList.add("active");
+    cardViewBtn.classList.remove("active");
+    displayFilteredActivities();
+  });
 
   // Dark mode toggle
   const darkModeToggle = document.getElementById("dark-mode-toggle");
