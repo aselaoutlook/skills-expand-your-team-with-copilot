@@ -36,6 +36,9 @@ document.addEventListener("DOMContentLoaded", () => {
     technology: { label: "Technology", color: "#e8eaf6", textColor: "#3949ab" },
   };
 
+  // Display order for category groups (matches the order in the filter buttons)
+  const categoryDisplayOrder = ["sports", "arts", "academic", "community", "technology"];
+
   // State for activities and filters
   let allActivities = {};
   let currentFilter = "all";
@@ -488,14 +491,20 @@ document.addEventListener("DOMContentLoaded", () => {
         groups[type][name] = details;
       });
 
-      // Render each group with a header
-      Object.keys(groups).sort().forEach((type) => {
-        const typeInfo = activityTypes[type] || { label: type, color: "#f5f5f5", textColor: "#333" };
+      // Render each group with a header, using the defined display order
+      const orderedTypes = categoryDisplayOrder.filter((type) => groups[type]);
+      const remainingTypes = Object.keys(groups).filter((type) => !categoryDisplayOrder.includes(type)).sort();
+      [...orderedTypes, ...remainingTypes].forEach((type) => {
+        const typeInfo = activityTypes[type];
         const groupHeader = document.createElement("div");
         groupHeader.className = "group-header";
-        groupHeader.style.backgroundColor = typeInfo.color;
-        groupHeader.style.color = typeInfo.textColor;
-        groupHeader.textContent = typeInfo.label;
+        if (typeInfo) {
+          groupHeader.style.backgroundColor = typeInfo.color;
+          groupHeader.style.color = typeInfo.textColor;
+          groupHeader.textContent = typeInfo.label;
+        } else {
+          groupHeader.textContent = type;
+        }
         activitiesList.appendChild(groupHeader);
 
         const groupGrid = document.createElement("div");

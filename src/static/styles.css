@@ -811,6 +811,8 @@ body.dark-mode .activity-tag {
   margin-top: 10px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  background-color: var(--background);
+  color: var(--text-primary);
 }
 
 .group-grid {
