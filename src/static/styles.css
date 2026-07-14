@@ -84,6 +84,7 @@ body::after {
 }
 
 body::before {
+  /* Percentage-based node and branch positions keep the pattern aligned as the viewport scales. */
   opacity: 0.18;
   background:
     radial-gradient(circle at 14% 18%, rgba(77, 124, 15, 0.3) 0 7px, transparent 8px),
