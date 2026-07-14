@@ -245,6 +245,15 @@ section h3 {
   color: var(--primary);
 }
 
+.share-url-input {
+  width: 100%;
+  padding: 6px;
+  margin-top: 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
 /* Activity Tag */
 .activity-tag {
   position: absolute;

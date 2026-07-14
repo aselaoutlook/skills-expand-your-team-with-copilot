@@ -637,16 +637,31 @@ document.addEventListener("DOMContentLoaded", () => {
     dropdown.className = "share-dropdown";
     dropdown.dataset.activity = activityName;
     dropdown.innerHTML = `
-      <button class="share-option" id="share-copy-link">📋 Copy Link</button>
-      <button class="share-option" id="share-email">📧 Share via Email</button>
+      <button class="share-option" id="share-copy-link" aria-label="Copy link to this activity">📋 Copy Link</button>
+      <button class="share-option" id="share-email" aria-label="Share this activity via email">📧 Share via Email</button>
     `;
 
     document.body.appendChild(dropdown);
 
-    // Position the dropdown below the share button
+    // Position the dropdown below the button, adjusting for viewport boundaries
     const rect = button.getBoundingClientRect();
-    dropdown.style.top = `${rect.bottom + window.scrollY + 6}px`;
-    dropdown.style.left = `${rect.left + window.scrollX}px`;
+    const dropdownWidth = 160;
+    const dropdownHeight = 80;
+    let top = rect.bottom + window.scrollY + 6;
+    let left = rect.left + window.scrollX;
+
+    // Flip above the button if it would overflow the bottom of the viewport
+    if (rect.bottom + dropdownHeight > window.innerHeight) {
+      top = rect.top + window.scrollY - dropdownHeight - 6;
+    }
+
+    // Shift left if it would overflow the right edge of the viewport
+    if (left + dropdownWidth > window.innerWidth) {
+      left = window.innerWidth + window.scrollX - dropdownWidth - 8;
+    }
+
+    dropdown.style.top = `${top}px`;
+    dropdown.style.left = `${left}px`;
 
     // Copy link handler
     dropdown.querySelector("#share-copy-link").addEventListener("click", () => {
@@ -658,6 +673,8 @@ document.addEventListener("DOMContentLoaded", () => {
           showShareUrlFallback(shareUrl);
         });
       dropdown.remove();
+      document.removeEventListener("click", onOutsideClick, true);
+      document.removeEventListener("keydown", onEscapeKey);
     });
 
     // Email handler
@@ -668,6 +685,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const body = encodeURIComponent(`${shareText}\n\n${shareUrl}`);
       window.location.href = `mailto:?subject=${subject}&body=${body}`;
       dropdown.remove();
+      document.removeEventListener("click", onOutsideClick, true);
+      document.removeEventListener("keydown", onEscapeKey);
     });
 
     // Close dropdown when clicking elsewhere
@@ -675,9 +694,21 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!dropdown.contains(e.target) && e.target !== button) {
         dropdown.remove();
         document.removeEventListener("click", onOutsideClick, true);
+        document.removeEventListener("keydown", onEscapeKey);
       }
     }
+
+    // Close dropdown on Escape key
+    function onEscapeKey(e) {
+      if (e.key === "Escape") {
+        dropdown.remove();
+        document.removeEventListener("click", onOutsideClick, true);
+        document.removeEventListener("keydown", onEscapeKey);
+      }
+    }
+
     document.addEventListener("click", onOutsideClick, true);
+    document.addEventListener("keydown", onEscapeKey);
   }
 
   // Show the share URL in a small modal so the user can copy it manually
@@ -691,7 +722,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="modal-content">
           <span class="close-share-fallback">&times;</span>
           <h3>Copy this link</h3>
-          <input id="share-url-input" type="text" readonly style="width:100%;padding:6px;margin-top:10px;border:1px solid var(--border);border-radius:4px;font-size:0.85rem;" />
+          <input id="share-url-input" type="text" readonly class="share-url-input" />
         </div>
       `;
       document.body.appendChild(fallback);
