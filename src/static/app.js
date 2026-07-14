@@ -568,6 +568,9 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
         `
         }
+        <button class="share-button" data-activity="${name}" aria-label="Share this activity">
+          🔗 Share
+        </button>
       </div>
     `;
 
@@ -587,7 +590,102 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
+    // Add click handler for share button
+    const shareButton = activityCard.querySelector(".share-button");
+    shareButton.addEventListener("click", (event) => {
+      shareActivity(event, name, details.description);
+    });
+
     activitiesList.appendChild(activityCard);
+  }
+
+  // Share an activity using native Web Share API or a fallback dropdown
+  function shareActivity(event, activityName, description) {
+    const shareUrl =
+      `${window.location.origin}${window.location.pathname}` +
+      `?activity=${encodeURIComponent(activityName)}`;
+    const shareTitle = `${activityName} – Mergington High School`;
+    const shareText = `Check out this activity: ${activityName}. ${description}`;
+
+    // Use the native Web Share API when available (mobile/modern browsers)
+    if (navigator.share) {
+      navigator
+        .share({ title: shareTitle, text: shareText, url: shareUrl })
+        .catch(() => {
+          // User cancelled or share failed — do nothing
+        });
+      return;
+    }
+
+    // Fallback: show a small dropdown beneath the button
+    showShareDropdown(event.currentTarget, activityName, shareUrl, shareText);
+  }
+
+  // Build and display the share dropdown beneath the share button
+  function showShareDropdown(button, activityName, shareUrl, shareText) {
+    // Remove any existing dropdown
+    const existing = document.getElementById("share-dropdown");
+    if (existing) {
+      existing.remove();
+      // If the dropdown belonged to the same button, toggling closes it
+      if (existing.dataset.activity === activityName) return;
+    }
+
+    const dropdown = document.createElement("div");
+    dropdown.id = "share-dropdown";
+    dropdown.className = "share-dropdown";
+    dropdown.dataset.activity = activityName;
+    dropdown.innerHTML = `
+      <button class="share-option" id="share-copy-link">📋 Copy Link</button>
+      <button class="share-option" id="share-email">📧 Share via Email</button>
+    `;
+
+    document.body.appendChild(dropdown);
+
+    // Position the dropdown below the share button
+    const rect = button.getBoundingClientRect();
+    dropdown.style.top = `${rect.bottom + window.scrollY + 6}px`;
+    dropdown.style.left = `${rect.left + window.scrollX}px`;
+
+    // Copy link handler
+    dropdown.querySelector("#share-copy-link").addEventListener("click", () => {
+      navigator.clipboard
+        .writeText(shareUrl)
+        .then(() => showMessage("Link copied to clipboard!", "success"))
+        .catch(() => {
+          // Fallback for browsers without clipboard API
+          const input = document.createElement("input");
+          input.value = shareUrl;
+          document.body.appendChild(input);
+          input.select();
+          document.execCommand("copy");
+          document.body.removeChild(input);
+          showMessage("Link copied to clipboard!", "success");
+        });
+      dropdown.remove();
+    });
+
+    // Email handler
+    dropdown.querySelector("#share-email").addEventListener("click", () => {
+      const subject = encodeURIComponent(
+        `Check out this activity: ${activityName}`
+      );
+      const body = encodeURIComponent(`${shareText}\n\n${shareUrl}`);
+      window.location.href = `mailto:?subject=${subject}&body=${body}`;
+      dropdown.remove();
+    });
+
+    // Close dropdown when clicking elsewhere
+    function onOutsideClick(e) {
+      if (!dropdown.contains(e.target) && e.target !== button) {
+        dropdown.remove();
+        document.removeEventListener("click", onOutsideClick, true);
+      }
+    }
+    // Use capture so we catch clicks before they bubble elsewhere
+    setTimeout(() => {
+      document.addEventListener("click", onOutsideClick, true);
+    }, 0);
   }
 
   // Event listeners for search and filter
