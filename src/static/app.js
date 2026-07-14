@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById("activity-search");
   const searchButton = document.getElementById("search-button");
   const categoryFilters = document.querySelectorAll(".category-filter");
+  const groupByFilters = document.querySelectorAll(".group-by-filter");
   const dayFilters = document.querySelectorAll(".day-filter");
   const timeFilters = document.querySelectorAll(".time-filter");
   const difficultyFilters = document.querySelectorAll(".difficulty-filter");
@@ -38,6 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // State for activities and filters
   let allActivities = {};
   let currentFilter = "all";
+  let currentGroupBy = "";
   let searchQuery = "";
   let currentDay = "";
   let currentTimeRange = "";
@@ -55,6 +57,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Initialize filters from active elements
   function initializeFilters() {
+    const activeGroupByFilter = document.querySelector(".group-by-filter.active");
+    if (activeGroupByFilter) {
+      currentGroupBy = activeGroupByFilter.dataset.groupBy;
+    }
+
     // Initialize day filter
     const activeDayFilter = document.querySelector(".day-filter.active");
     if (activeDayFilter) {
@@ -475,13 +482,58 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Display filtered activities
-    Object.entries(filteredActivities).forEach(([name, details]) => {
-      renderActivityCard(name, details);
+    if (currentGroupBy === "category") {
+      renderGroupedActivities(filteredActivities);
+      return;
+    }
+
+    renderActivityCards(filteredActivities, activitiesList);
+  }
+
+  function renderActivityCards(activities, container) {
+    Object.entries(activities).forEach(([name, details]) => {
+      renderActivityCard(name, details, container);
+    });
+  }
+
+  function renderGroupedActivities(activities) {
+    const groupedActivities = {};
+
+    Object.entries(activities).forEach(([name, details]) => {
+      const activityType = getActivityType(name, details.description);
+
+      if (!groupedActivities[activityType]) {
+        groupedActivities[activityType] = {};
+      }
+
+      groupedActivities[activityType][name] = details;
+    });
+
+    Object.keys(activityTypes).forEach((activityType) => {
+      if (!groupedActivities[activityType]) {
+        return;
+      }
+
+      const groupSection = document.createElement("section");
+      groupSection.className = "activity-group";
+
+      const groupHeading = document.createElement("h3");
+      groupHeading.className = "activity-group-header";
+      groupHeading.textContent = activityTypes[activityType].label;
+
+      const groupList = document.createElement("div");
+      groupList.className = "activity-group-list";
+
+      renderActivityCards(groupedActivities[activityType], groupList);
+
+      groupSection.appendChild(groupHeading);
+      groupSection.appendChild(groupList);
+      activitiesList.appendChild(groupSection);
     });
   }
 
   // Function to render a single activity card
-  function renderActivityCard(name, details) {
+  function renderActivityCard(name, details, container) {
     const activityCard = document.createElement("div");
     activityCard.className = "activity-card";
 
@@ -605,7 +657,7 @@ document.addEventListener("DOMContentLoaded", () => {
       shareActivity(event, name, details.description);
     });
 
-    activitiesList.appendChild(activityCard);
+    container.appendChild(activityCard);
   }
 
   // Share an activity using native Web Share API or a fallback dropdown
@@ -776,6 +828,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Update current filter and display filtered activities
       currentFilter = button.dataset.category;
+      displayFilteredActivities();
+    });
+  });
+
+  groupByFilters.forEach((button) => {
+    button.addEventListener("click", () => {
+      groupByFilters.forEach((btn) => btn.classList.remove("active"));
+      button.classList.add("active");
+
+      currentGroupBy = button.dataset.groupBy;
       displayFilteredActivities();
     });
   });

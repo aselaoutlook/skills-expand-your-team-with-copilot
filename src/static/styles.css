@@ -617,6 +617,7 @@ footer {
 }
 
 .category-filters,
+.group-by-filters,
 .day-filters,
 .time-filters,
 .difficulty-filters {
@@ -626,6 +627,7 @@ footer {
 }
 
 .category-filter,
+.group-by-filter,
 .day-filter,
 .time-filter,
 .difficulty-filter {
@@ -640,6 +642,7 @@ footer {
 }
 
 .category-filter.active,
+.group-by-filter.active,
 .day-filter.active,
 .time-filter.active,
 .difficulty-filter.active {
@@ -649,6 +652,7 @@ footer {
 }
 
 .category-filter:hover,
+.group-by-filter:hover,
 .day-filter:hover,
 .time-filter:hover,
 .difficulty-filter:hover {
@@ -658,6 +662,22 @@ footer {
 
 .time-filters {
   width: 100%;
+}
+
+.activity-group {
+  grid-column: 1 / -1;
+}
+
+.activity-group-header {
+  margin: 0 0 10px;
+  color: var(--primary);
+  font-size: 1rem;
+}
+
+.activity-group-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
 }
 
 .reset-button {
