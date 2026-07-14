@@ -593,6 +593,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Add click handler for share button
     const shareButton = activityCard.querySelector(".share-button");
     shareButton.addEventListener("click", (event) => {
+      event.stopPropagation();
       shareActivity(event, name, details.description);
     });
 
@@ -653,14 +654,8 @@ document.addEventListener("DOMContentLoaded", () => {
         .writeText(shareUrl)
         .then(() => showMessage("Link copied to clipboard!", "success"))
         .catch(() => {
-          // Fallback for browsers without clipboard API
-          const input = document.createElement("input");
-          input.value = shareUrl;
-          document.body.appendChild(input);
-          input.select();
-          document.execCommand("copy");
-          document.body.removeChild(input);
-          showMessage("Link copied to clipboard!", "success");
+          // Fallback: show the URL so the user can copy it manually
+          showShareUrlFallback(shareUrl);
         });
       dropdown.remove();
     });
@@ -682,10 +677,43 @@ document.addEventListener("DOMContentLoaded", () => {
         document.removeEventListener("click", onOutsideClick, true);
       }
     }
-    // Use capture so we catch clicks before they bubble elsewhere
+    document.addEventListener("click", onOutsideClick, true);
+  }
+
+  // Show the share URL in a small modal so the user can copy it manually
+  function showShareUrlFallback(url) {
+    let fallback = document.getElementById("share-url-fallback");
+    if (!fallback) {
+      fallback = document.createElement("div");
+      fallback.id = "share-url-fallback";
+      fallback.className = "modal hidden";
+      fallback.innerHTML = `
+        <div class="modal-content">
+          <span class="close-share-fallback">&times;</span>
+          <h3>Copy this link</h3>
+          <input id="share-url-input" type="text" readonly style="width:100%;padding:6px;margin-top:10px;border:1px solid var(--border);border-radius:4px;font-size:0.85rem;" />
+        </div>
+      `;
+      document.body.appendChild(fallback);
+      fallback
+        .querySelector(".close-share-fallback")
+        .addEventListener("click", () => {
+          fallback.classList.remove("show");
+          setTimeout(() => fallback.classList.add("hidden"), 300);
+        });
+      fallback.addEventListener("click", (e) => {
+        if (e.target === fallback) {
+          fallback.classList.remove("show");
+          setTimeout(() => fallback.classList.add("hidden"), 300);
+        }
+      });
+    }
+    document.getElementById("share-url-input").value = url;
+    fallback.classList.remove("hidden");
     setTimeout(() => {
-      document.addEventListener("click", onOutsideClick, true);
-    }, 0);
+      fallback.classList.add("show");
+      document.getElementById("share-url-input").select();
+    }, 10);
   }
 
   // Event listeners for search and filter
