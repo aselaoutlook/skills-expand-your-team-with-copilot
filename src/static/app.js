@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const dayFilters = document.querySelectorAll(".day-filter");
   const timeFilters = document.querySelectorAll(".time-filter");
   const difficultyFilters = document.querySelectorAll(".difficulty-filter");
+  const groupByOptions = document.querySelectorAll(".group-by-option");
 
   // Authentication elements
   const loginButton = document.getElementById("login-button");
@@ -35,6 +36,9 @@ document.addEventListener("DOMContentLoaded", () => {
     technology: { label: "Technology", color: "#e8eaf6", textColor: "#3949ab" },
   };
 
+  // Display order for category groups (matches the order in the filter buttons)
+  const categoryDisplayOrder = ["sports", "arts", "academic", "community", "technology"];
+
   // State for activities and filters
   let allActivities = {};
   let currentFilter = "all";
@@ -42,6 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentDay = "";
   let currentTimeRange = "";
   let currentDifficulty = "";
+  let currentGroupBy = "";
 
   // Authentication state
   let currentUser = null;
@@ -474,14 +479,51 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Display filtered activities
-    Object.entries(filteredActivities).forEach(([name, details]) => {
-      renderActivityCard(name, details);
-    });
+    // Display filtered activities, grouped if needed
+    if (currentGroupBy === "category") {
+      // Group activities by category
+      const groups = {};
+      Object.entries(filteredActivities).forEach(([name, details]) => {
+        const type = getActivityType(name, details.description);
+        if (!groups[type]) {
+          groups[type] = {};
+        }
+        groups[type][name] = details;
+      });
+
+      // Render each group with a header, using the defined display order
+      const orderedTypes = categoryDisplayOrder.filter((type) => groups[type]);
+      const remainingTypes = Object.keys(groups).filter((type) => !categoryDisplayOrder.includes(type)).sort();
+      [...orderedTypes, ...remainingTypes].forEach((type) => {
+        const typeInfo = activityTypes[type];
+        const groupHeader = document.createElement("div");
+        groupHeader.className = "group-header";
+        if (typeInfo) {
+          groupHeader.style.backgroundColor = typeInfo.color;
+          groupHeader.style.color = typeInfo.textColor;
+          groupHeader.textContent = typeInfo.label;
+        } else {
+          groupHeader.textContent = type;
+        }
+        activitiesList.appendChild(groupHeader);
+
+        const groupGrid = document.createElement("div");
+        groupGrid.className = "group-grid";
+        Object.entries(groups[type]).forEach(([name, details]) => {
+          renderActivityCard(name, details, groupGrid);
+        });
+        activitiesList.appendChild(groupGrid);
+      });
+    } else {
+      // Display filtered activities without grouping
+      Object.entries(filteredActivities).forEach(([name, details]) => {
+        renderActivityCard(name, details);
+      });
+    }
   }
 
   // Function to render a single activity card
-  function renderActivityCard(name, details) {
+  function renderActivityCard(name, details, container) {
     const activityCard = document.createElement("div");
     activityCard.className = "activity-card";
 
@@ -605,7 +647,7 @@ document.addEventListener("DOMContentLoaded", () => {
       shareActivity(event, name, details.description);
     });
 
-    activitiesList.appendChild(activityCard);
+    (container || activitiesList).appendChild(activityCard);
   }
 
   // Share an activity using native Web Share API or a fallback dropdown
@@ -815,6 +857,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Update current difficulty filter and display filtered activities
       currentDifficulty = button.dataset.difficulty;
+      displayFilteredActivities();
+    });
+  });
+
+  // Add event listeners for group-by option buttons
+  groupByOptions.forEach((button) => {
+    button.addEventListener("click", () => {
+      // Update active class
+      groupByOptions.forEach((btn) => btn.classList.remove("active"));
+      button.classList.add("active");
+
+      // Update current group-by and display activities
+      currentGroupBy = button.dataset.group;
       displayFilteredActivities();
     });
   });
