@@ -1,0 +1,105 @@
+name: Add a New Activity
+description: Request a new extracurricular activity to be added to the system.
+title: "Add Activity: [Activity Name]"
+labels: ["enhancement", "activity-management"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Add a New Extracurricular Activity
+        Please fill out this form to request a new activity. The more detail you provide, the faster this can be completed. All fields marked as required must be filled in.
+
+  - type: input
+    id: activity-name
+    attributes:
+      label: Activity Name
+      description: The full name of the activity as it should appear on the website.
+      placeholder: e.g. Drama Club
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Activity Description
+      description: A short description of what the activity involves. This will be shown to students on the website.
+      placeholder: e.g. Students explore acting, stagecraft, and performance through rehearsals and school productions.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: difficulty
+    attributes:
+      label: Difficulty Level
+      description: How would you rate the skill level needed for this activity?
+      options:
+        - Beginner
+        - Intermediate
+        - Advanced
+        - Not applicable
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: days
+    attributes:
+      label: Meeting Days
+      description: Which days of the week does this activity meet?
+      options:
+        - label: Monday
+        - label: Tuesday
+        - label: Wednesday
+        - label: Thursday
+        - label: Friday
+        - label: Saturday
+        - label: Sunday
+    validations:
+      required: true
+
+  - type: input
+    id: start-time
+    attributes:
+      label: Start Time
+      description: What time does the activity start? Use 24-hour format (HH:MM).
+      placeholder: e.g. 15:30
+    validations:
+      required: true
+
+  - type: input
+    id: end-time
+    attributes:
+      label: End Time
+      description: What time does the activity end? Use 24-hour format (HH:MM).
+      placeholder: e.g. 17:00
+    validations:
+      required: true
+
+  - type: input
+    id: max-participants
+    attributes:
+      label: Maximum Number of Participants
+      description: What is the maximum number of students who can join this activity?
+      placeholder: e.g. 20
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: How will you know this has been done correctly?
+      value: |
+        - [ ] The new activity appears on the website with the correct name and description.
+        - [ ] The schedule shows the correct days and times.
+        - [ ] The correct maximum number of participants is enforced.
+        - [ ] The difficulty level is displayed correctly.
+        - [ ] Students can register for the activity (if spots are available).
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Notes
+      description: Any other information that might be helpful, such as a supervising teacher's name or special requirements.
+      placeholder: e.g. This activity is supervised by Ms. Johnson and requires students to bring their own art supplies.
