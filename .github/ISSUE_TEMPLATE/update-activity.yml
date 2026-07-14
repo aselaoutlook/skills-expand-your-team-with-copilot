@@ -1,0 +1,116 @@
+name: Update Activity Details
+description: Request changes to an existing activity's name, description, schedule, or participant limit.
+title: "Update Activity: [Activity Name]"
+labels: ["enhancement", "activity-management"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Update an Existing Activity
+        Use this form to request changes to any details of an activity already listed on the website. Please be as specific as possible about what needs to change and what the new value should be.
+
+  - type: input
+    id: activity-name
+    attributes:
+      label: Current Activity Name
+      description: The exact name of the activity as it currently appears on the website.
+      placeholder: e.g. Chess Club
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: fields-to-change
+    attributes:
+      label: What Needs to Be Changed?
+      description: Select all that apply.
+      options:
+        - label: Activity name
+        - label: Description
+        - label: Meeting days
+        - label: Start or end time
+        - label: Maximum number of participants
+        - label: Difficulty level
+    validations:
+      required: true
+
+  - type: input
+    id: new-name
+    attributes:
+      label: New Activity Name (if changing the name)
+      description: Leave blank if the name is not changing.
+      placeholder: e.g. Advanced Chess Club
+
+  - type: textarea
+    id: new-description
+    attributes:
+      label: New Description (if changing the description)
+      description: The updated description to display on the website. Leave blank if the description is not changing.
+      placeholder: e.g. An advanced chess program for experienced players, focusing on tournament preparation.
+
+  - type: checkboxes
+    id: new-days
+    attributes:
+      label: New Meeting Days (if changing the schedule)
+      description: Select all days the activity will meet after the change. Leave all unchecked if the days are not changing.
+      options:
+        - label: Monday
+        - label: Tuesday
+        - label: Wednesday
+        - label: Thursday
+        - label: Friday
+        - label: Saturday
+        - label: Sunday
+
+  - type: input
+    id: new-start-time
+    attributes:
+      label: New Start Time (if changing the time)
+      description: Use 24-hour format (HH:MM). Leave blank if the start time is not changing.
+      placeholder: e.g. 16:00
+
+  - type: input
+    id: new-end-time
+    attributes:
+      label: New End Time (if changing the time)
+      description: Use 24-hour format (HH:MM). Leave blank if the end time is not changing.
+      placeholder: e.g. 18:00
+
+  - type: input
+    id: new-max-participants
+    attributes:
+      label: New Maximum Number of Participants (if changing the limit)
+      description: Leave blank if the participant limit is not changing.
+      placeholder: e.g. 25
+
+  - type: dropdown
+    id: new-difficulty
+    attributes:
+      label: New Difficulty Level (if changing the difficulty)
+      description: Select "(No change)" if the difficulty level is not changing.
+      options:
+        - (No change)
+        - Beginner
+        - Intermediate
+        - Advanced
+        - Not applicable
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: Reason for Change
+      description: Briefly explain why this change is needed.
+      placeholder: e.g. The club has grown and needs a larger room, so we are increasing the participant limit.
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: How will you know this update has been done correctly?
+      value: |
+        - [ ] The activity on the website reflects all requested changes.
+        - [ ] No existing participant registrations are lost.
+        - [ ] The updated schedule (if changed) shows the correct days and times.
+    validations:
+      required: true

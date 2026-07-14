@@ -1,0 +1,69 @@
+name: Request a New Feature
+description: Suggest an improvement or a new feature for the activities website.
+title: "Feature Request: [Short Description]"
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Request a New Feature or Improvement
+        Have an idea to make the website better for teachers or students? Please describe it here. The more detail you include, the easier it will be to turn your idea into reality.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the situation or difficulty that this feature would address.
+      placeholder: e.g. I find it difficult to see which activities still have open spots at a glance without clicking into each one.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed Solution
+      description: Describe how you would like the website to work. Be as specific as possible.
+      placeholder: e.g. Add a "spots available" badge to each activity card on the main page, showing the number of open spots remaining.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: who-benefits
+    attributes:
+      label: Who benefits from this change?
+      description: Select the group that would benefit most.
+      options:
+        - Teachers
+        - Students
+        - Both teachers and students
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: How important is this to you?
+      options:
+        - Nice to have
+        - Important
+        - Urgent — blocking my work
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: Describe what "done" looks like. How will you know this feature has been implemented correctly?
+      placeholder: |
+        - [ ] The new feature appears on the website and works as described.
+        - [ ] It does not break any existing functionality.
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context or Examples
+      description: Any extra information, sketches, or examples from other websites that illustrate your idea.
+      placeholder: e.g. Similar to how sports registration websites show "3 spots left" on each event listing.

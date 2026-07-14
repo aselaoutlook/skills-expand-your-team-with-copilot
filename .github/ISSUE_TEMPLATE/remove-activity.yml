@@ -1,0 +1,60 @@
+name: Remove an Activity
+description: Request that an existing activity be removed from the website.
+title: "Remove Activity: [Activity Name]"
+labels: ["activity-management"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Remove an Extracurricular Activity
+        Use this form to request the removal of an activity from the website. Please note that removing an activity will also delete the list of registered participants. This action cannot be undone.
+
+  - type: input
+    id: activity-name
+    attributes:
+      label: Activity Name
+      description: The exact name of the activity as it currently appears on the website.
+      placeholder: e.g. Chess Club
+    validations:
+      required: true
+
+  - type: dropdown
+    id: reason
+    attributes:
+      label: Reason for Removal
+      description: Why should this activity be removed?
+      options:
+        - Activity has ended for the school year
+        - Activity has been cancelled permanently
+        - Activity was added by mistake
+        - Activity is being replaced by a new one
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: reason-details
+    attributes:
+      label: Additional Details
+      description: Please provide any extra context, especially if the reason is "Other" or if a replacement activity should be added at the same time.
+      placeholder: e.g. This club is being replaced by "Advanced Chess Club" which will be added in a separate request.
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: How will you know this has been done correctly?
+      value: |
+        - [ ] The activity no longer appears on the website.
+        - [ ] Students can no longer register for the removed activity.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Confirmation
+      description: Please confirm you understand what will happen when this activity is removed.
+      options:
+        - label: I understand that removing this activity will also delete the list of registered participants and this cannot be undone.
+          required: true

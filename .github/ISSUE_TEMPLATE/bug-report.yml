@@ -1,0 +1,85 @@
+name: Report a Bug or Problem
+description: Something on the website is not working correctly. Use this form to let us know.
+title: "Bug: [Short Description]"
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Report a Problem
+        Thank you for letting us know about this issue. Please describe what went wrong so we can fix it as quickly as possible.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What went wrong?
+      description: Describe the problem clearly. What did you see that was unexpected?
+      placeholder: e.g. When I try to register a student for Soccer Team, I get an error message and the student is not added.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: What should have happened instead?
+      description: Describe what you expected to happen.
+      placeholder: e.g. The student's email should appear in the participants list after I click Register.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: List the steps someone else would need to follow to see this problem happen.
+      placeholder: |
+        1. Log in as a teacher.
+        2. Click on Soccer Team.
+        3. Click "Register Student".
+        4. Enter a student email and click submit.
+        5. See the error.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: how-often
+    attributes:
+      label: How often does this happen?
+      options:
+        - Every time I try
+        - Sometimes (not every time)
+        - Only happened once
+    validations:
+      required: true
+
+  - type: dropdown
+    id: affected-area
+    attributes:
+      label: Which part of the website is affected?
+      options:
+        - Viewing the list of activities
+        - Registering a student for an activity
+        - Removing a student from an activity
+        - Logging in or out
+        - Searching or filtering activities
+        - Something else
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Information
+      description: Any other details that might help — for example, the student's email you were trying to register, or the name of the activity.
+      placeholder: e.g. This only seems to happen with the Soccer Team activity, not others.
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: How will you know the bug has been fixed?
+      value: |
+        - [ ] The reported problem no longer occurs.
+        - [ ] The feature works as expected as described in "What should have happened instead?"
+    validations:
+      required: true
